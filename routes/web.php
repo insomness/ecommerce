@@ -23,4 +23,7 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('/', 'Admin\DashboardController@index')->name('dashboard');
     Route::resource('products', 'Admin\ProductController');
+    Route::resource('orders', 'Admin\OrderController')->only(['index', 'show']);
+    Route::patch('/orders/{id}/switchstatus', 'Admin\OrderController@switchStatus')->name('orders.switchstatus');
+    Route::resource('users', 'Admin\UserController');
 });

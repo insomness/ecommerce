@@ -27,13 +27,13 @@
                 </a>
             </li>
             <li>
-                <a href="">
+                <a href="{{route('admin.orders.index')}}">
                     <i class="ti-calendar"></i>
                     <p>Orders</p>
                 </a>
             </li>
             <li>
-                <a href="">
+                <a href="{{route('admin.users.index')}}">
                     <i class="fa fa-users"></i>
                     <p>Users</p>
                 </a>
