@@ -27,9 +27,9 @@
                         <td>{{$product->name}}</td>
                         <td>Rp. {{number_format($product->price, null ,',','.')}}</td>
                         <td>
-                            <a href="{{route('admin.products.edit', $product->id)}}" class="btn btn-sm btn-info ti-pencil-alt" title="Edit">Edit</a>
+                            <a href="{{route('admin.products.edit', $product->id)}}" class="btn btn-sm btn-success ti-pencil-alt" title="Edit">Edit</a>
 
-                            <form action="{{route('admin.products.destroy', $product->id)}}" method="post" style="display: inline-block" id="form-delete">
+                            <form action="{{route('admin.products.destroy', $product->id)}}" method="post" style="display: inline-block" class="form-delete">
                                 @method('DELETE')
                                 @csrf
                                 <button type="button" class="btn btn-sm btn-danger ti-trash" onclick="return alertConfirm()" title="Delete">Delete</button>

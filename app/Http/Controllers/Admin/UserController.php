@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Order;
 use App\User;
 use Illuminate\Http\Request;
+use DataTables;
 
 class UserController extends Controller
 {
@@ -13,12 +15,26 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('admin.users.index', compact('users'));
-    }
+        if ($request->ajax()) {
+            $data = User::query();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('actions', function (User $user) {
+                    $route = route('admin.users.show', $user->id);
+                    $btn = "<a href='$route' class='edit btn btn-primary btn-sm'>View</a>";
+                    return $btn;
+                })
+                ->rawColumns(['actions'])
+                ->editColumn('created_at', function (User $user) {
+                    return $user->created_at->toDateString();
+                })
+                ->make(true);
+        };
 
+        return view('admin.users.index');
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -46,9 +62,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        //
+        $orders = Order::where('user_id', $user->id)->get();
+        return view('admin.users.show', compact(['orders', 'user']));
     }
 
     /**

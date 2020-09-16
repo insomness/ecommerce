@@ -16,14 +16,23 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+// admin
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], function () {
     Route::get('/', 'Admin\DashboardController@index')->name('dashboard');
     Route::resource('products', 'Admin\ProductController');
     Route::resource('orders', 'Admin\OrderController')->only(['index', 'show']);
     Route::patch('/orders/{id}/switchstatus', 'Admin\OrderController@switchStatus')->name('orders.switchstatus');
     Route::resource('users', 'Admin\UserController');
 });
+
+// front
+Route::get('/', 'Front\HomeController@index');
+
+// front profile
+Route::get('/profiles', 'Front\ProfileController@index');
+Route::get('/orders/{id}', 'Front\ProfileController@showOrder');
+
+// cart
+Route::get('/carts', 'Front\CartController@index')->name('carts');
+Route::post('/carts/{product}', 'Front\CartController@store')->name('carts.store');
+Route::delete('/carts/{id}', 'Front\CartController@destroy')->name('carts.destroy');

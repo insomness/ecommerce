@@ -34,7 +34,7 @@
                                 <div class="form-group">
                                     <label>Product Image:</label>
                                     <input type="file" class="form-control border-input" name="image" id="files">
-                                    <img id="image" class="img-thumbnail" src="{{asset('storage/'.$product->image   )}}"/>
+                                    <img id="image" class="img-thumbnail" src="{{asset('storage/products/normal/'.$product->image   )}}"/>
                                 </div>
 
                         </div>

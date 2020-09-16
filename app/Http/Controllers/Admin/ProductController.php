@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
+use Symfony\Component\Console\Input\Input;
 
 class ProductController extends Controller
 {
@@ -41,18 +43,40 @@ class ProductController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|max:255',
-            'price' => 'required',
+            'price' => 'required|numeric',
             'description' => 'required',
             'image' => 'required|mimes:png,jpg,jpeg'
         ]);
 
-        $path = $request->image->store('product_image', 'public');
+        //get filename with extension
+        $filenamewithextension = $request->file('image')->getClientOriginalName();
+
+        //get filename without extension
+        $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+
+        //get file extension
+        $extension = $request->file('image')->getClientOriginalExtension();
+
+        //filename to store
+        $filenametostore = $filename . '_' . time() . '.' . $extension;
+
+        //Upload File
+        $request->file('image')->storeAs('public/products/normal', $filenametostore);
+        $request->file('image')->storeAs('public/products/thumbnail', $filenametostore);
+
+        //Resize image here
+        $thumbnailpath = public_path('storage/products/thumbnail/' . $filenametostore);
+        $img = Image::make($thumbnailpath)->resize(null, 300, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+
+        $img->save($thumbnailpath);
 
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $path
+            'image' => $filenametostore,
         ]);
 
         return redirect()->route('admin.products.create')->with('status', 'Product has been added!');
@@ -97,17 +121,41 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            Storage::delete('public/' . $product->image);
-            $path = $request->image->store('product_image', 'public');
+            Storage::delete('public/products/normal/' . $product->image);
+            Storage::delete('public/products/thumbnail/' . $product->image);
+            //get filename with extension
+            $filenamewithextension = $request->file('image')->getClientOriginalName();
+
+            //get filename without extension
+            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+
+            //get file extension
+            $extension = $request->file('image')->getClientOriginalExtension();
+
+            //filename to store
+            $filenametostore = $filename . '_' . time() . '.' . $extension;
+
+            //Upload File
+            $request->file('image')->storeAs('public/products/normal', $filenametostore);
+            $request->file('image')->storeAs('public/products/thumbnail', $filenametostore);
+
+            //Resize image here
+            $thumbnailpath = public_path('storage/products/thumbnail/' . $filenametostore);
+            $img = Image::make($thumbnailpath)->resize(null, 300, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+
+            $img->save($thumbnailpath);
         } else {
-            $path = $product->image;
+            $filenametostore = $product->image;
         }
 
         Product::where('id', $product->id)->update([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $path
+            'image' => $filenametostore
         ]);
 
         return redirect()->route('admin.products.index')->with('status', 'Product has been updated!');
@@ -121,7 +169,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        Storage::delete('public' . $product->image);
+        Storage::delete('public/products/normal/' . $product->image);
+        Storage::delete('public/products/thumbnail/' . $product->image);
         Product::destroy($product->id);
         return redirect()->route('admin.products.index')->with('status', 'Products has been deleted!');
     }

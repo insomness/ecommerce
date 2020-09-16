@@ -44,11 +44,21 @@
                         <tr>
                             <th>Image</th>
                             <td>
-                                <img src="{{asset('storage/'.$product->image)}}"  width="300px" style="object-fit: cover">
+                                <img src="{{asset('storage/products/thumbnail/'.$product->image)}}" style="object-fit: cover">
                             </td>
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="ml-5">
+                    <a href="{{route('admin.products.edit', $product->id)}}" class="btn btn-sm btn-primary" title="Edit">Edit</a>
+
+                    <form action="{{route('admin.products.destroy', $product->id)}}" method="post" style="display: inline-block" class="form-delete">
+                        @method('DELETE')
+                        @csrf
+                        <button type="button" class="btn btn-sm btn-danger" onclick="return alertConfirm()" title="Delete">Delete</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -9,7 +9,7 @@
                 <p class="category">List of all registered users</p>
             </div>
             <div class="content table-responsive table-full-width">
-                <table class="table table-striped">
+                <table class="table table-striped" id="table">
                     <thead>
                     <tr>
                         <th>ID</th>
@@ -19,25 +19,27 @@
                         <th>Actions</th>
                     </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($users as $user)
-                            <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$user->name}}</td>
-                                <td>{{$user->email}}</td>
-                                <td>{{$user->created_at}}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success ti-close" title="Block User"></button>
-
-                                    <button class="btn btn-sm btn-primary ti-view-list-alt" title="Details"></button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
-
             </div>
         </div>
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+$(function () {
+var table = $('#table').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('admin.users.index') }}",
+    columns: [
+        {data: 'id', name: 'id'},
+        {data: 'name', name: 'name'},
+        {data: 'email', name: 'email'},
+        {data: 'created_at', name: 'created-at'},
+        {data: 'actions', name: 'actions', orderable: false, searchable: false},
+    ]
+    });
+});
+</script>
+@endpush

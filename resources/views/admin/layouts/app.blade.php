@@ -7,12 +7,14 @@
     <title>JavasShop AdminTemplate</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
     <meta name="viewport" content="width=device-width"/>
-    <link href="{{asset('adminTemplate')}}/assets/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="{{asset('adminTemplate')}}/assets/css/animate.min.css" rel="stylesheet"/>
     <link href="{{asset('adminTemplate')}}/assets/css/paper-dashboard.css" rel="stylesheet"/>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
     <link href="{{asset('adminTemplate')}}/assets/css/themify-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
     <style>
         .swal2-popup {
            font-size: 1.6rem !important;
@@ -94,13 +96,13 @@
 
     </div>
 </div>
-
-@stack('scripts')
+ <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+ <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+ <!-- Include all compiled plugins (below), or include individual files as needed -->
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-<script src="{{asset('adminTemplate')}}/assets/js/jquery-1.10.2.js" type="text/javascript"></script>
-<script src="{{asset('adminTemplate')}}/assets/js/bootstrap.min.js" type="text/javascript"></script>
 <script>
-    // cara pakai gunakan id='form-delete pada tag form'
+    // cara pakai gunakan class='form-delete pada tag form'
     const alertConfirm = () => {
       Swal.fire({
         title: 'Are you sure?',
@@ -112,10 +114,16 @@
         confirmButtonText: 'Yes, delete it!',
           }).then((result) => {
             if (result.value) {
-                document.querySelector('#form-delete').submit();
+                $('.form-delete').submit();
             }
           });
       }
 </script>
+
+{{-- datatables --}}
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap.min.js "></script>
+
+@stack('scripts')
 </body>
 </html>
