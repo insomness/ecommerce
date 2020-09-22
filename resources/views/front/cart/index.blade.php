@@ -1,99 +1,89 @@
 @extends('front.layouts.app')
 @section('content')
 
-<h2 class="mt-5"><i class="fa fa-shopping-cart"></i> Shooping Cart</h2>
-<hr>
+<div class="container" style="margin: 50px auto;">
 
-<h4 class="mt-5">4 items(s) in Shopping Cart</h4>
-<div class="cart-items">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mt-5"><i class="fa fa-shopping-cart"></i> Shooping Cart</h2>
+            <hr>
+            <h4 class="mt-5">{{$carts->count()}} items(s) in Shopping Cart</h4>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <table class="table">
-                <tbody>
-                    @foreach ($items as $item)
-                    <tr>
+                @foreach ($carts as $cart)
+                    <tr class="cart-{{$cart->id}}">
                         <td>
-                            <img src="/storage/products/thumbnail/{{$item->product->image}}" style="width: 5em">
+                            <img src="{{asset('storage/products/thumbnail/' . $cart->associatedModel->image)}}" style="object-fit: cover" height="100px">
                         </td>
-                        <td>
-                            <strong>{{$item->name}}</strong>
+                        <td style="vertical-align: middle">
+                            <strong>{{$cart->name}}</strong>
+                            <br>
+                            <small>{{$cart->associatedModel->description}}</small>
                         </td>
-                        <td>
-                            <a href="">Remove</a><br>
-                            <a href="">Save for later</a>
+                        <td style="vertical-align: middle">
+                            <a href="">Remove</a>
+                            <br>
+                            <a href="">Save For Later</a>
                         </td>
-                        <td>
-                            <select name="" id="" class="form-control" style="width: 4.7em">
-                                <option value="">1</option>
-                                <option value="">2</option>
+                        <td style="vertical-align: middle">
+                            <select class="form-control" style="width: 80px" data-id="{{$cart->id}}">
+                                @for ($i = 1; $i <= 50; $i++)
+                                    <option value={{$i}} {{$i == $cart->quantity ? 'selected' : ''}}>{{$i}}</option>
+                                @endfor
                             </select>
                         </td>
-                        <td>$233</td>
+                        <td style="vertical-align: middle" class="price">
+                            <span class="amountofunit">Rp. {{number_format($cart->price * $cart->quantity, null ,',','.')}}</span>
+                            <br>
+                            (Rp. {{number_format($cart->price, null ,',','.')}} / Unit)
+                        </td>
                     </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-        </div>
-        <!-- Price Details -->
-            <div class="col-md-6">
-                    <div class="sub-total">
-                         <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th colspan="2">Price Details</th>
-                                </tr>
-                            </thead>
-                                <tr>
-                                    <td>Subtotal </td>
-                                    <td>12500.00 </td>
-                                </tr>
-                                <tr>
-                                    <td>Text</td>
-                                    <td>2133.00</td>
-                                </tr>
-                                <tr>
-                                    <th>Total</th>
-                                    <th>1,8444</th>
-                                </tr>
-                         </table>
-                     </div>
-                </div>
-            <!-- Save for later  -->
-            <div class="col-md-12">
-                <button class="btn btn-outline-dark">Continue Shopping</button>
-                <button class="btn btn-outline-info">Proceed to checkout</button>
-            <hr>
-            </div>
-
-            <div class="col-md-12">
-            <h4>2 items Save for Later</h4>
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <td><img src="" style="width: 5em"></td>
-                        <td>
-                            <strong>Mac</strong><br> This is some text for the product
-                        </td>
-
-                        <td>
-                            <a href="">Remove</a><br>
-                            <a href="">Save for later</a>
-                        </td>
-
-                        <td>
-                            <select name="" id="" class="form-control" style="width: 4.7em">
-                                <option value="">1</option>
-                                <option value="">2</option>
-                            </select>
-                        </td>
-
-                        <td>$233</td>
-                    </tr>
-                </tbody>
+                @endforeach
             </table>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $('.table tr .form-control').on('change', function(){
+        const productId = $(this).data('id');
+        const quantityChanged = parseInt($(this).val());
+
+        $.ajax({
+        url: 'carts',
+        dataType: 'json',
+        type: 'PATCH',
+        data: {
+            productId: productId,
+            quantityChanged: quantityChanged,
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (data) {
+            cartList(data);
+        },
+        error: function(xhr, ajaxOption, thrownError){
+            if(xhr.status == 401){
+                window.location.href = "{{route('login')}}"
+            }
+        }
+    });
+});
+
+
+function cartList(data){
+        let {cart} = data;
+        $(`.cart-${cart.id} .price .amountofunit`).html('Rp. ' + numberWithCommas(cart.price * cart.quantity));
+        $(`.product-widget[data-id=${cart.id}] .product-price .qty`).html(`${cart.quantity} x`);
+    }
+
+</script>
+@endpush
 

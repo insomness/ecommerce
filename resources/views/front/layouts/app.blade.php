@@ -1,76 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-<head>
+        <title>{{config('app.name')}}</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+		<!-- Google font -->
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
 
-    <title>Home</title>
+		<!-- Bootstrap -->
+		<link type="text/css" rel="stylesheet" href="{{asset('frontTemplate')}}/css/bootstrap.min.css"/>
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <!-- Custom styles for this template -->
-    <link href="{{asset('frontTemplate')}}/css/heroic-features.css" rel="stylesheet">
+		<!-- Slick -->
+		<link type="text/css" rel="stylesheet" href="{{asset('frontTemplate')}}/css/slick.css"/>
+		<link type="text/css" rel="stylesheet" href="{{asset('frontTemplate')}}/css/slick-theme.css"/>
 
-</head>
+		<!-- nouislider -->
+		<link type="text/css" rel="stylesheet" href="{{asset('frontTemplate')}}/css/nouislider.min.css"/>
 
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">LaravelShop</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route('carts')}}"><i class="fa fa-shopping-cart"></i> Cart <strong>()</strong>
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-user"></i> {{auth()->check() ? auth()->user()->name : 'Account'}}
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="bd-versions">
-                        @guest
-                            <a class="dropdown-item " href="{{route('login')}}">Login</a>
-                            <a class="dropdown-item" href="{{route('register')}}">Register</a>
-                        @else
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                            onclick="event.preventDefault();document.getElementById('logout-form').submit();">
-                            {{ __('Logout') }}
+		<!-- Font Awesome Icon -->
+		<link rel="stylesheet" href="{{asset('frontTemplate')}}/css/font-awesome.min.css">
+
+		<!-- Custom stlylesheet -->
+		<link type="text/css" rel="stylesheet" href="{{asset('frontTemplate')}}/css/style.css"/>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    </head>
+	<body>
+		<!-- HEADER -->
+		<header>
+			<!-- MAIN HEADER -->
+			<div id="header">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<!-- LOGO -->
+						<div class="col-md-7">
+							<div class="">
+								<a href="/" class="" >
+                                    <h1 style="color: white; margin-top: 11px">{{config('app.name')}}</h1>
+								</a>
+							</div>
+						</div>
+						<!-- /LOGO -->
+
+
+						<!-- ACCOUNT -->
+						<div class="col-md-5 ">
+							<div class="header-ctn">
+
+                                @auth
+								<!-- Wishlist -->
+								<div>
+									<a href="#">
+										<i class="fa fa-heart-o"></i>
+										<span>Your Wishlist</span>
+									</a>
+								</div>
+                                <!-- /Wishlist -->
+                                @endauth
+
+								<!-- Cart -->
+								<div class="dropdown">
+									<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+										<i class="fa fa-shopping-cart"></i>
+                                        <span>Your Cart</span>
+                                        @php
+                                            $carts = auth()->check() ?  \Cart::session(auth()->user()->id)->getContent() : [];
+                                        @endphp
+                                        @if ($carts)
+										    <div class="qty cartCount">{{$carts->count()}}</div>
+                                        @endif
+                                    </a>
+                                    @auth
+									<div class="cart-dropdown">
+										<div class="cart-list">
+                                            @foreach ($carts as $cart)
+											<div class="product-widget"  data-id="{{$cart->id}}">
+												<div class="product-img">
+													<img src="{{asset('storage/products/thumbnail/' . $cart->associatedModel->image)}}">
+												</div>
+												<div class="product-body">
+                                                    <h3 class="product-name"><a href="#">{{$cart->name}}</a></h3>
+													<h4 class="product-price"><span class="qty">{{$cart->quantity}}x</span>Rp. {{number_format($cart->price, null ,',','.')}}</h4>
+												</div>
+												<button class="delete"><i class="fa fa-close"></i></button>
+											</div>
+                                            @endforeach
+										</div>
+										<div class="cart-summary">
+											<small class="cartCount">{{$carts->count()}} Item(s) selected</small>
+											<h5 class="subTotal">SUBTOTAL: Rp. {{number_format(\Cart::session(auth()->user()->id)->getSubTotal(), null ,',','.')}}</h5>
+										</div>
+										<div class="cart-btns">
+											<a href="/carts">View Cart</a>
+											<a href="#">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
+										</div>
+									</div>
+                                    @endauth
+								</div>
+                                <!-- /Cart -->
+
+								<!-- Menu Toogle -->
+								<div class="menu-toggle">
+									<a href="#">
+										<i class="fa fa-bars"></i>
+										<span>Menu</span>
+									</a>
+								</div>
+								<!-- /Menu Toogle -->
+							</div>
+						</div>
+						<!-- /ACCOUNT -->
+					</div>
+					<!-- row -->
+				</div>
+				<!-- container -->
+			</div>
+			<!-- /MAIN HEADER -->
+		</header>
+		<!-- /HEADER -->
+
+		<!-- NAVIGATION -->
+		<nav id="navigation">
+			<!-- container -->
+			<div class="container">
+				<!-- responsive-nav -->
+				<div id="responsive-nav">
+					<!-- NAV -->
+					<ul class="main-nav nav navbar-nav">
+						<li class="active"><a href="#">Home</a></li>
+						<li><a href="#">Hot Deals</a></li>
+						<li><a href="#">Categories</a></li>
+						<li><a href="#">Laptops</a></li>
+						<li><a href="#">Smartphones</a></li>
+						<li><a href="#">Cameras</a></li>
+                        <li><a href="#">Accessories</a></li>
+                    </ul>
+                    <ul class="main-nav nav navbar-nav navbar-right" style="padding-top: 3px;">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                                <i class="fa fa-user"></i>
+                                <span>{{auth()->check() ? auth()->user()->name : 'Account' }}</span>
                             </a>
 
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
-                        @endguest
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            @guest
+                                <li><a href="{{route('login')}}" >Login</a></li>
+                                <li><a href="{{route('register')}}">Register</a></li>
+                            @else
+                                <li>
+                                    <a  href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+                                </li>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                            @endguest
+                            </ul>
+                        </li>
+                    </ul>
+					<!-- /NAV -->
+				</div>
+				<!-- /responsive-nav -->
+			</div>
+			<!-- /container -->
+		</nav>
+		<!-- /NAVIGATION -->
 
+        @yield('content')
 
-<!-- Page Content -->
-<div class="container">
-    @yield('content')
-</div>
-<!-- /.container -->
+		<!-- FOOTER -->
+		<footer id="footer">
+			<!-- top footer -->
+			<div class="section">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">About Us</h3>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+								<ul class="footer-links">
+									<li><a href="#"><i class="fa fa-map-marker"></i>1734 Stonecoal Road</a></li>
+									<li><a href="#"><i class="fa fa-phone"></i>+021-95-51-84</a></li>
+									<li><a href="#"><i class="fa fa-envelope-o"></i>email@email.com</a></li>
+								</ul>
+							</div>
+						</div>
 
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Categories</h3>
+								<ul class="footer-links">
+									<li><a href="#">Hot deals</a></li>
+									<li><a href="#">Laptops</a></li>
+									<li><a href="#">Smartphones</a></li>
+									<li><a href="#">Cameras</a></li>
+									<li><a href="#">Accessories</a></li>
+								</ul>
+							</div>
+						</div>
 
+						<div class="clearfix visible-xs"></div>
 
-<!-- Bootstrap core JavaScript -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-</body>
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Information</h3>
+								<ul class="footer-links">
+									<li><a href="#">About Us</a></li>
+									<li><a href="#">Contact Us</a></li>
+									<li><a href="#">Privacy Policy</a></li>
+									<li><a href="#">Orders and Returns</a></li>
+									<li><a href="#">Terms & Conditions</a></li>
+								</ul>
+							</div>
+						</div>
 
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Service</h3>
+								<ul class="footer-links">
+									<li><a href="#">My Account</a></li>
+									<li><a href="#">View Cart</a></li>
+									<li><a href="#">Wishlist</a></li>
+									<li><a href="#">Track My Order</a></li>
+									<li><a href="#">Help</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /top footer -->
+
+			<!-- bottom footer -->
+			<div id="bottom-footer" class="section">
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-12 text-center">
+							<ul class="footer-payments">
+								<li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
+								<li><a href="#"><i class="fa fa-credit-card"></i></a></li>
+								<li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
+								<li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
+								<li><a href="#"><i class="fa fa-cc-discover"></i></a></li>
+								<li><a href="#"><i class="fa fa-cc-amex"></i></a></li>
+							</ul>
+							<span class="copyright">
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+								Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							</span>
+						</div>
+					</div>
+						<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /bottom footer -->
+		</footer>
+        <!-- /FOOTER -->
+        <div class="overlay"></div>
+		<!-- jQuery Plugins -->
+		<script src="{{asset('frontTemplate')}}/js/jquery.min.js"></script>
+		<script src="{{asset('frontTemplate')}}/js/bootstrap.min.js"></script>
+		<script src="{{asset('frontTemplate')}}/js/slick.min.js"></script>
+		<script src="{{asset('frontTemplate')}}/js/nouislider.min.js"></script>
+		<script src="{{asset('frontTemplate')}}/js/jquery.zoom.min.js"></script>
+        <script src="{{asset('frontTemplate')}}/js/main.js"></script>
+        <script src="{{asset('frontTemplate')}}/js/myCart.js"></script>
+        @stack('scripts')
+	</body>
 </html>

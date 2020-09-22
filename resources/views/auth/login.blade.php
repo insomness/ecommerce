@@ -1,7 +1,7 @@
 @extends('front.layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container" style="margin: 70px auto">
     <div class="row">
         <div class="col-md-12" id="register">
             <div class="card col-md-8">
@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="form-group">
-                            <button class="btn btn-outline-info col-md-2"> Login</button>
+                            <button class="btn btn-outline-info"> Login</button>
                         </div>
 
                         <div class="form-group row">

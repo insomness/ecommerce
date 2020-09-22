@@ -34,5 +34,7 @@ Route::get('/orders/{id}', 'Front\ProfileController@showOrder');
 
 // cart
 Route::get('/carts', 'Front\CartController@index')->name('carts');
-Route::post('/carts/{product}', 'Front\CartController@store')->name('carts.store');
-Route::delete('/carts/{id}', 'Front\CartController@destroy')->name('carts.destroy');
+Route::get('/carts/clear', 'Front\CartController@clear');
+Route::post('/carts', 'Front\CartController@add')->name('carts.add');
+Route::patch('/carts', 'Front\CartController@update')->name('carts.update');
+Route::delete('/carts', 'Front\CartController@destroy')->name('carts.destroy');
